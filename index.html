@@ -1680,6 +1680,352 @@ function toast(msg,type='info'){
 }
 
 window.addEventListener('DOMContentLoaded',init);
-</script>
+(function(){
+  let GW_WHEEL_ROTATION = 0;
+
+  const style = document.createElement('style');
+  style.textContent = `
+    #gwWheel{
+      transition:transform 3s cubic-bezier(.08,.78,.12,1) !important;
+      will-change:transform;
+    }
+    #gwWheel.gw-wheel-spinning{
+      filter:saturate(1.25) brightness(1.08) drop-shadow(0 0 22px rgba(255,179,0,.55));
+    }
+    #dogNumber.number-pop{
+      animation:numberPop .22s ease-in-out;
+    }
+  `;
+  document.head.appendChild(style);
+
+  function gwUnlockAudio(){
+    try{
+      if(typeof initAudio === 'function') initAudio();
+      if(window.audioCtx && audioCtx.state === 'suspended'){
+        audioCtx.resume().catch(function(){});
+      }
+    }catch(e){}
+  }
+
+  document.addEventListener('click', gwUnlockAudio, {passive:true});
+  document.addEventListener('touchstart', gwUnlockAudio, {passive:true});
+
+  function gwWheelSound(kind){
+    try{
+      gwUnlockAudio();
+      if(!window.audioCtx) return;
+
+      const t = audioCtx.currentTime;
+      const master = audioCtx.createGain();
+      master.gain.value = kind === 'win' ? 0.42 : 0.34;
+      master.connect(audioCtx.destination);
+
+      if(kind === 'tick'){
+        const o = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        o.type = 'square';
+        o.frequency.setValueAtTime(760, t);
+        g.gain.setValueAtTime(0.13, t);
+        g.gain.exponentialRampToValueAtTime(0.001, t + 0.055);
+        o.connect(g);
+        g.connect(master);
+        o.start(t);
+        o.stop(t + 0.06);
+      }
+
+      if(kind === 'spin'){
+        const o = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        o.type = 'sawtooth';
+        o.frequency.setValueAtTime(130, t);
+        o.frequency.exponentialRampToValueAtTime(520, t + 0.35);
+        g.gain.setValueAtTime(0.16, t);
+        g.gain.exponentialRampToValueAtTime(0.001, t + 0.38);
+        o.connect(g);
+        g.connect(master);
+        o.start(t);
+        o.stop(t + 0.4);
+      }
+
+      if(kind === 'stop'){
+        [680,520,390].forEach(function(f,i){
+          const o = audioCtx.createOscillator();
+          const g = audioCtx.createGain();
+          o.type = 'triangle';
+          o.frequency.setValueAtTime(f, t + i * 0.08);
+          g.gain.setValueAtTime(0.16, t + i * 0.08);
+          g.gain.exponentialRampToValueAtTime(0.001, t + i * 0.08 + 0.2);
+          o.connect(g);
+          g.connect(master);
+          o.start(t + i * 0.08);
+          o.stop(t + i * 0.08 + 0.22);
+        });
+      }
+
+      if(kind === 'win'){
+        [523,659,784,1046].forEach(function(f,i){
+          const o = audioCtx.createOscillator();
+          const g = audioCtx.createGain();
+          o.type = 'sine';
+          o.frequency.setValueAtTime(f, t + i * 0.1);
+          g.gain.setValueAtTime(0.18, t + i * 0.1);
+          g.gain.exponentialRampToValueAtTime(0.001, t + i * 0.1 + 0.32);
+          o.connect(g);
+          g.connect(master);
+          o.start(t + i * 0.1);
+          o.stop(t + i * 0.1 + 0.35);
+        });
+      }
+    }catch(e){}
+  }
+
+  window.playThankYouVoice = function(){
+    return false;
+  };
+
+  window.speakThankYouFallback = function(){
+    return false;
+  };
+
+  window.playWheelSpinSounds = function(durationMs){
+    gwWheelSound('spin');
+
+    let elapsed = 0;
+    const timer = setInterval(function(){
+      elapsed += 120;
+      gwWheelSound('tick');
+
+      if(typeof keepMusicRunning === 'function'){
+        keepMusicRunning();
+      }
+
+      if(elapsed >= durationMs){
+        clearInterval(timer);
+        gwWheelSound('stop');
+      }
+    },120);
+  };
+
+  function gwFakeNumber(){
+    try{
+      if(window.state && state.tickets && state.tickets.length){
+        const fake = state.tickets[Math.floor(Math.random() * state.tickets.length)].id;
+        return String(fake).padStart(3,'0');
+      }
+    }catch(e){}
+    return String(Math.floor(100 + Math.random() * 900));
+  }
+
+  function gwPopNumber(el){
+    if(!el) return;
+    el.classList.remove('number-pop');
+    void el.offsetWidth;
+    el.classList.add('number-pop');
+  }
+
+  window.runDogDrawSequence = function(tickets,name){
+    gwUnlockAudio();
+
+    if(typeof keepMusicRunning === 'function'){
+      keepMusicRunning();
+    }
+
+    const overlay = document.getElementById('dogDrawOverlay');
+    const wheel = document.getElementById('gwWheel');
+    const wheelStage = document.getElementById('wheelStage');
+    const wheelHeadline = document.getElementById('wheelSpinHeadline');
+    const numEl = document.getElementById('dogNumber');
+    const resCard = document.getElementById('dogResultCard');
+    const resNums = document.getElementById('wheelNums');
+    const resName = document.getElementById('wheelName');
+    const controls = document.getElementById('wheelControls');
+    const title = document.getElementById('wheelTitle');
+    const hint = document.getElementById('wheelHint');
+
+    if(!overlay || !wheel || !wheelStage || !numEl || !resCard){
+      alert('Glücksrad-Elemente nicht gefunden.');
+      return;
+    }
+
+    overlay.classList.add('active');
+    wheelStage.style.display = 'flex';
+    resCard.style.display = 'none';
+    numEl.textContent = '---';
+
+    let current = 0;
+
+    function drawOne(){
+      if(typeof keepMusicRunning === 'function'){
+        keepMusicRunning();
+      }
+
+      if(current >= tickets.length){
+        showFinal();
+        return;
+      }
+
+      const ticket = tickets[current];
+      const ticketNumber = String(ticket.id).padStart(3,'0');
+
+      if(title) title.textContent = '🎡 Los ' + (current + 1) + ' von ' + tickets.length + ' wird gezogen...';
+      if(wheelHeadline) wheelHeadline.textContent = '🎡 Los ' + (current + 1) + ' von ' + tickets.length + ' dreht …';
+
+      wheelStage.style.display = 'flex';
+      resCard.style.display = 'none';
+      if(controls) controls.innerHTML = '';
+
+      window.playWheelSpinSounds(3200);
+
+      let steps = 0;
+      const flicker = setInterval(function(){
+        numEl.textContent = gwFakeNumber();
+        gwPopNumber(numEl);
+        if(steps % 2 === 0) gwWheelSound('tick');
+        steps++;
+
+        if(typeof keepMusicRunning === 'function'){
+          keepMusicRunning();
+        }
+
+        if(steps >= 42){
+          clearInterval(flicker);
+        }
+      },75);
+
+      const extra = 2160 + Math.floor(Math.random() * 720) + current * 97;
+      const endRotation = GW_WHEEL_ROTATION + extra;
+
+      wheel.classList.remove('gw-wheel-spinning');
+      wheel.style.transition = 'none';
+      wheel.style.transform = 'rotate(' + GW_WHEEL_ROTATION + 'deg)';
+
+      void wheel.offsetWidth;
+
+      wheel.classList.add('gw-wheel-spinning');
+      wheel.style.transition = 'transform 3.2s cubic-bezier(.08,.78,.12,1)';
+      wheel.style.transform = 'rotate(' + endRotation + 'deg)';
+
+      GW_WHEEL_ROTATION = endRotation;
+
+      setTimeout(function(){
+        clearInterval(flicker);
+
+        wheel.classList.remove('gw-wheel-spinning');
+        numEl.textContent = ticketNumber;
+        gwPopNumber(numEl);
+
+        const isWin = ticket.id % settings.winEvery === 0;
+
+        gwWheelSound(isWin ? 'win' : 'stop');
+
+        if(typeof playSound === 'function'){
+          playSound(isWin ? 'win' : 'success');
+        }
+
+        if(typeof spawnWheelSparkles === 'function'){
+          spawnWheelSparkles(isWin ? 70 : 35);
+        }
+
+        setTimeout(function(){
+          wheelStage.style.display = 'none';
+          resCard.style.display = 'block';
+
+          if(resName) resName.textContent = '👤 ' + name;
+          if(resNums) resNums.innerHTML = '';
+
+          for(let i = 0; i <= current; i++){
+            const tk = tickets[i];
+            const tkWin = tk.id % settings.winEvery === 0;
+            const div = document.createElement('div');
+            div.className = 'res-num' + (tkWin ? ' win' : '');
+            div.innerHTML =
+              String(tk.id).padStart(3,'0') +
+              '<span style="font-size:0.75rem;background:rgba(255,255,255,0.22);border-radius:10px;padding:2px 8px;text-transform:uppercase;">' +
+              (tkWin ? '🎉 GEWINN' : '❌ Niete') +
+              '</span>';
+            div.style.display = 'flex';
+            div.style.flexDirection = 'column';
+            div.style.alignItems = 'center';
+            div.style.gap = '5px';
+            resNums.appendChild(div);
+          }
+
+          if(hint){
+            hint.innerHTML = '<p style="color:#2E7D32;font-weight:700;">✅ Gespeichert! Du findest deine Lose im Reiter „Meine Lose“.</p>';
+          }
+
+          current++;
+
+          if(current < tickets.length){
+            if(controls){
+              controls.innerHTML = '<div style="font-weight:900;color:#E65100;font-size:1.15rem;animation:pulse 1s infinite">Nächstes Los dreht gleich … 🎡</div>';
+            }
+            setTimeout(drawOne, 1800);
+          }else{
+            if(controls){
+              controls.innerHTML = '<div style="font-weight:900;color:#2E7D32;font-size:1.15rem;animation:pulse 1s infinite">Dein Ergebnis wird vorbereitet … ✨</div>';
+            }
+            setTimeout(showFinal, 1200);
+          }
+        },700);
+      },3250);
+    }
+
+    function showFinal(){
+      if(typeof keepMusicRunning === 'function'){
+        keepMusicRunning();
+      }
+
+      if(title) title.textContent = '🎉 Danke für deine Unterstützung!';
+      wheelStage.style.display = 'none';
+      resCard.style.display = 'block';
+
+      if(resName) resName.textContent = '👤 ' + name;
+      if(resNums) resNums.innerHTML = '';
+
+      let hasWin = false;
+
+      tickets.forEach(function(tk){
+        const isWin = tk.id % settings.winEvery === 0;
+        if(isWin) hasWin = true;
+
+        const div = document.createElement('div');
+        div.className = 'res-num' + (isWin ? ' win' : '');
+        div.innerHTML = String(tk.id).padStart(3,'0');
+        resNums.appendChild(div);
+      });
+
+      gwWheelSound(hasWin ? 'win' : 'stop');
+
+      if(typeof spawnWheelSparkles === 'function'){
+        spawnWheelSparkles(hasWin ? 90 : 50);
+      }
+
+      if(hint){
+        hint.innerHTML = '<p style="color:#2E7D32;font-weight:900;font-size:1.1rem;margin-top:10px;">🍀 Vielen Dank! Deine Unterstützung hilft den Tieren.</p>';
+      }
+
+      if(controls){
+        controls.innerHTML = '<div style="font-weight:900;color:#E65100;font-size:1rem;animation:pulse 1s infinite;margin-top:15px;">Du kommst gleich automatisch zurück zur Tombola …</div>';
+      }
+
+      setTimeout(function(){
+        if(typeof closeDogDraw === 'function'){
+          closeDogDraw();
+        }else{
+          overlay.classList.remove('active');
+        }
+
+        if(typeof showTab === 'function'){
+          showTab('home');
+        }
+
+        window.scrollTo({top:0,behavior:'smooth'});
+      },5600);
+    }
+
+    drawOne();
+  };
+})();</script>
 </body>
 </html>
