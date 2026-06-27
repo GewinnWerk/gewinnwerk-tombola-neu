@@ -1,0 +1,22 @@
+GEWINNWERK – NEUES GITHUB REPOSITORY
+
+Dieses ZIP ist für das neue saubere Repository.
+
+WICHTIG:
+Die ZIP auf dem Mac zuerst entpacken.
+Bei GitHub / Upload existing files NICHT die ZIP-Datei hochladen.
+Du lädst die Dateien AUS dem entpackten Ordner hoch:
+
+index.html
+Alpenhorn_Tanzzug.mp3
+
+Danach:
+1. Commit changes klicken
+2. Settings öffnen
+3. Pages öffnen
+4. Deploy from branch auswählen
+5. Branch: main
+6. Folder: / root
+7. Save klicken
+
+Mehr Dateien brauchst du erstmal nicht.
