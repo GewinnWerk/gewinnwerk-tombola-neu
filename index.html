@@ -1444,7 +1444,7 @@ function runDogDrawSequence(tickets,name){
           const tkWin=tk.id%settings.winEvery===0;
           const div=document.createElement('div');
           div.className='res-num'+(tkWin?' win':'');
-          div.style.position='relative';
+         numEl.textContent=String(100 + ((Number(fake) * 37) % 900)).padStart(3,'0');
           div.style.display='flex';
           div.style.flexDirection='column';
           div.style.alignItems='center';
