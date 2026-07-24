@@ -1,12 +1,9 @@
 "use client";
+/* eslint-disable @next/next/no-img-element -- Vereins- und Sponsorenlogos können dynamische Data-URLs oder externe URLs sein. */
 
-import { useMemo, useState } from "react";
-
-const prizes = [
-  { place: "Hauptgewinn", title: "Familien-Erlebnistag", value: "Wert 250 €", tone: "gold" },
-  { place: "2. Preis", title: "Genusskorb aus der Region", value: "Wert 120 €", tone: "coral" },
-  { place: "3. Preis", title: "Vereins-Fanpaket", value: "Wert 75 €", tone: "blue" },
-];
+import Link from "next/link";
+import { CSSProperties, useEffect, useMemo, useState } from "react";
+import { defaultConfig, readConfig, TombolaConfig } from "../lib/tombola-config";
 
 const sold = new Set([1, 2, 5, 8, 11, 14, 17, 21, 26, 31, 34, 38, 41, 44, 47, 53, 57, 62]);
 
@@ -22,10 +19,27 @@ function Icon({ name }: { name: "ticket" | "shield" | "heart" | "arrow" | "check
 }
 
 export default function Home() {
+  const [config, setConfig] = useState<TombolaConfig>(defaultConfig);
   const [selected, setSelected] = useState<number[]>([7, 23]);
   const [showAll, setShowAll] = useState(false);
-  const ticketNumbers = useMemo(() => Array.from({ length: showAll ? 100 : 64 }, (_, index) => index + 1), [showAll]);
-  const total = selected.length * 2.5;
+  const [spinning, setSpinning] = useState(false);
+  const [winner, setWinner] = useState<number | null>(null);
+  const [rotation, setRotation] = useState(0);
+  const visibleTickets = Math.min(config.totalTickets, showAll ? config.totalTickets : 64);
+  const ticketNumbers = useMemo(() => Array.from({ length: visibleTickets }, (_, index) => index + 1), [visibleTickets]);
+  const total = selected.length * config.ticketPrice;
+  const pageStyle = { "--green": config.primaryColor, "--coral": config.accentColor } as CSSProperties;
+
+  useEffect(() => {
+    const refresh = () => setConfig(readConfig());
+    refresh();
+    window.addEventListener("storage", refresh);
+    window.addEventListener("vereinsglueck-config", refresh);
+    return () => {
+      window.removeEventListener("storage", refresh);
+      window.removeEventListener("vereinsglueck-config", refresh);
+    };
+  }, []);
 
   function toggleTicket(number: number) {
     if (sold.has(number)) return;
@@ -34,29 +48,43 @@ export default function Home() {
     );
   }
 
+  function startWheel() {
+    if (spinning) return;
+    const pool = selected.length ? selected : [7, 23, 39, 56];
+    const nextWinner = pool[Math.floor(Math.random() * pool.length)];
+    setWinner(null);
+    setSpinning(true);
+    setRotation((current) => current + 1440 + (360 - (nextWinner % 12) * 30));
+    window.setTimeout(() => {
+      setWinner(nextWinner);
+      setSpinning(false);
+    }, 4300);
+  }
+
   return (
-    <main>
+    <main style={pageStyle}>
       <header className="nav">
         <a className="brand" href="#" aria-label="Vereinsglück Startseite">
           <span className="brand-mark"><Icon name="ticket" /></span>
-          <span>Vereins<span>glück</span></span>
+          {config.logoDataUrl ? <img className="customer-logo" src={config.logoDataUrl} alt={`${config.associationName} Logo`} /> : <span>Vereins<span>glück</span></span>}
         </a>
         <nav aria-label="Hauptnavigation">
           <a href="#preise">Gewinne</a>
           <a href="#lose">Lose</a>
           <a href="#so-gehts">So geht&apos;s</a>
+          <a href="#ziehung">Ziehung</a>
         </nav>
-        <a className="nav-cta" href="#lose">Lose wählen <Icon name="arrow" /></a>
+        <div className="nav-actions"><Link className="admin-link" href="/admin">Admin</Link><a className="nav-cta" href="#lose">Lose wählen <Icon name="arrow" /></a></div>
       </header>
 
       <section className="hero">
         <div className="hero-copy">
           <span className="eyebrow">Digitale Vereinstombola · Live-Demo</span>
           <h1>Ein Los.<br />Viel <em>Vereinsglück.</em></h1>
-          <p>Mit jedem Los unterstützt du direkt die Jugendarbeit des Beispielvereins – und sicherst dir deine Chance auf tolle regionale Gewinne.</p>
+          <p>Mit jedem Los unterstützt du direkt {config.purpose} von {config.associationName} – und sicherst dir deine Chance auf tolle regionale Gewinne.</p>
           <div className="hero-actions">
             <a className="primary-button" href="#lose"><Icon name="ticket" /> Jetzt Lose sichern</a>
-            <span><strong>2,50 €</strong><small>pro Los</small></span>
+            <span><strong>{config.ticketPrice.toLocaleString("de-DE", { style: "currency", currency: "EUR" })}</strong><small>pro Los</small></span>
           </div>
           <div className="trust-row">
             <span><Icon name="shield" /> Sicher bezahlen</span>
@@ -75,8 +103,8 @@ export default function Home() {
           </div>
           <div className="event-card">
             <span>Nächste Ziehung</span>
-            <strong>Sonntag, 18:00 Uhr</strong>
-            <small>Live beim Vereinsfest</small>
+            <strong>{config.eventDate}, {config.drawTime}</strong>
+            <small>Live bei {config.eventName}</small>
           </div>
         </div>
       </section>
@@ -94,11 +122,11 @@ export default function Home() {
           <p>Von regionalen Partnern gestiftet. Damit möglichst viel vom Erlös dort ankommt, wo es gebraucht wird.</p>
         </div>
         <div className="prize-grid">
-          {prizes.map((prize, index) => (
-            <article className={`prize-card ${prize.tone}`} key={prize.title}>
+          {config.prizes.map((prize, index) => (
+            <article className={`prize-card ${["gold", "coral", "blue"][index]}`} key={`${prize.title}-${index}`}>
               <span className="prize-number">0{index + 1}</span>
               <div className="prize-visual">{index === 0 ? "✦" : index === 1 ? "◒" : "◆"}</div>
-              <span>{prize.place}</span>
+              <span>{index === 0 ? "Hauptgewinn" : `${index + 1}. Preis`}</span>
               <h3>{prize.title}</h3>
               <small>{prize.value}</small>
             </article>
@@ -134,13 +162,50 @@ export default function Home() {
                 </button>
               ))}
             </div>
-            <button className="show-more" onClick={() => setShowAll((value) => !value)}>{showAll ? "Weniger anzeigen" : "Alle 100 Lose anzeigen"}</button>
+            {config.totalTickets > 64 && <button className="show-more" onClick={() => setShowAll((value) => !value)}>{showAll ? "Weniger anzeigen" : `Alle ${config.totalTickets.toLocaleString("de-DE")} Lose anzeigen`}</button>}
             <div className="checkout">
               <div><span>{selected.length} Lose</span><strong>{total.toLocaleString("de-DE", { style: "currency", currency: "EUR" })}</strong></div>
               <button disabled={!selected.length}>Weiter zur Zahlung <Icon name="arrow" /></button>
             </div>
             <p className="demo-note">Demo: Die echte Zahlung wird erst nach Einrichtung des Vereinskontos aktiviert.</p>
           </div>
+        </div>
+      </section>
+
+      {config.sponsors.length > 0 && <section className="sponsor-section">
+        <span className="eyebrow">Mit Unterstützung von</span>
+        <h2>Starke Partner für den Verein.</h2>
+        <div className="sponsor-marquee"><div className="sponsor-track">
+          {[...config.sponsors, ...config.sponsors].map((sponsor, index) => <div className="sponsor-logo-card" key={`${sponsor.name}-${index}`}>{sponsor.logoUrl ? <img src={sponsor.logoUrl} alt={`${sponsor.name} Logo`} /> : <strong>{sponsor.name}</strong>}</div>)}
+        </div></div>
+      </section>}
+
+      <section className="draw-section" id="ziehung">
+        <div className="draw-copy">
+          <span className="eyebrow">Der große Gewinner-Moment</span>
+          <h2>Eine Ziehung, bei der alle hinschauen.</h2>
+          <p>Das Glücksrad mischt die gewählten Losnummern. Währenddessen bringt unser Vereins-Hund das Gewinnerlos auf die Bühne – für Beamer, Großbildschirm und Smartphone.</p>
+          <div className="draw-features"><span>Live auf Großbild</span><span>Faire Zufallsauswahl</span><span>Gewinner klar sichtbar</span></div>
+          <button className="draw-button" onClick={startWheel} disabled={spinning}>{spinning ? "Die Lose werden gemischt …" : winner ? "Noch einmal vorführen" : "Demo-Ziehung starten"} <Icon name="arrow" /></button>
+          <small className="draw-demo-note">Vorführmodus – es wird kein echtes Gewinnerlos gespeichert.</small>
+        </div>
+        <div className={`draw-stage ${spinning ? "is-spinning" : ""} ${winner ? "has-winner" : ""}`}>
+          <div className="stage-light light-one" /><div className="stage-light light-two" />
+          <div className="draw-status"><i /><span>{spinning ? "Ziehung läuft" : winner ? "Gewinner gezogen" : "Bereit für die Ziehung"}</span></div>
+          <div className="wheel-wrap">
+            <div className="wheel-pointer" />
+            <div className="premium-wheel" style={{ transform: `rotate(${rotation}deg)` }}>
+              {Array.from({ length: 12 }, (_, index) => <span style={{ transform: `rotate(${index * 30}deg) translateY(-128px)` }} key={index}>{index + 1}</span>)}
+            </div>
+            <div className="wheel-hub"><small>Vereins</small><strong>GLÜCK</strong></div>
+          </div>
+          <div className="dog-runner"><img src="/golden-retriever-runner.png" alt="Golden Retriever bringt das Gewinnerlos" /></div>
+          <div className="winner-card">
+            <span>Das Gewinnerlos</span>
+            <strong>{winner ? String(winner).padStart(3, "0") : "— — —"}</strong>
+            <small>{winner ? "Herzlichen Glückwunsch!" : "Wird gleich gezogen"}</small>
+          </div>
+          <div className="stage-particles">{Array.from({ length: 14 }, (_, index) => <i key={index} />)}</div>
         </div>
       </section>
 
