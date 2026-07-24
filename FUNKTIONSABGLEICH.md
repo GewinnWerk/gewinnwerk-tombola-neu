@@ -10,7 +10,7 @@ Stand: 24. Juli 2026
 | Gewinne | JSON-Eingabe | drei verständliche Formularzeilen | umgesetzt |
 | Sponsoren | Namen oder Bild-URLs | bis zu 20 Namen/Logo-URLs plus Laufband | umgesetzt |
 | Kundenseite | einzelne HTML-App | moderne responsive Next.js-Seite | umgesetzt |
-| Hund-/Losanimation | einfache Hunde-/Lotto-Sequenz | hochwertiges Hund-Maskottchen und Glücksrad-Demo | umgesetzt als Vorführmodus |
+| Ziehungsanimation | einfache Hunde-/Lotto-Sequenz | professionelles Glücksrad mit Gewinnerinszenierung | umgesetzt als Vorführmodus |
 | Admin-PIN und Rollen | lokale PIN/Master-PIN | noch nicht sicher angebunden | offen |
 | Mollie-Zahlung | altes Render-Backend | gehärteter Firebase-Funktionskern | Oberfläche noch nicht verbunden |
 | Meine Lose / Gewinnstatus | vorhanden | noch nicht angebunden | offen |

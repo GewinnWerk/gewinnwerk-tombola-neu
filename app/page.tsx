@@ -184,7 +184,7 @@ export default function Home() {
         <div className="draw-copy">
           <span className="eyebrow">Der große Gewinner-Moment</span>
           <h2>Eine Ziehung, bei der alle hinschauen.</h2>
-          <p>Das Glücksrad mischt die gewählten Losnummern. Währenddessen bringt unser Vereins-Hund das Gewinnerlos auf die Bühne – für Beamer, Großbildschirm und Smartphone.</p>
+          <p>Das Glücksrad mischt die gewählten Losnummern und setzt den Gewinner anschließend eindrucksvoll in Szene – für Beamer, Großbildschirm und Smartphone.</p>
           <div className="draw-features"><span>Live auf Großbild</span><span>Faire Zufallsauswahl</span><span>Gewinner klar sichtbar</span></div>
           <button className="draw-button" onClick={startWheel} disabled={spinning}>{spinning ? "Die Lose werden gemischt …" : winner ? "Noch einmal vorführen" : "Demo-Ziehung starten"} <Icon name="arrow" /></button>
           <small className="draw-demo-note">Vorführmodus – es wird kein echtes Gewinnerlos gespeichert.</small>
@@ -199,7 +199,6 @@ export default function Home() {
             </div>
             <div className="wheel-hub"><small>Vereins</small><strong>GLÜCK</strong></div>
           </div>
-          <div className="dog-runner"><img src="/golden-retriever-runner.png" alt="Golden Retriever bringt das Gewinnerlos" /></div>
           <div className="winner-card">
             <span>Das Gewinnerlos</span>
             <strong>{winner ? String(winner).padStart(3, "0") : "— — —"}</strong>
