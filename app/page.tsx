@@ -25,6 +25,8 @@ export default function Home() {
   const [spinning, setSpinning] = useState(false);
   const [winner, setWinner] = useState<number | null>(null);
   const [rotation, setRotation] = useState(0);
+  const [rollingNumber, setRollingNumber] = useState<number | null>(null);
+  const [wheelNumbers, setWheelNumbers] = useState<number[]>([7, 18, 23, 31, 42, 56, 64, 71, 78, 84, 91, 99]);
   const visibleTickets = Math.min(config.totalTickets, showAll ? config.totalTickets : 64);
   const ticketNumbers = useMemo(() => Array.from({ length: visibleTickets }, (_, index) => index + 1), [visibleTickets]);
   const total = selected.length * config.ticketPrice;
@@ -54,8 +56,22 @@ export default function Home() {
     const nextWinner = pool[Math.floor(Math.random() * pool.length)];
     setWinner(null);
     setSpinning(true);
+    const randomTicket = () => Math.floor(Math.random() * config.totalTickets) + 1;
+    const shuffleDisplay = () => {
+      const numbers = new Set<number>();
+      while (numbers.size < Math.min(12, config.totalTickets)) numbers.add(randomTicket());
+      const nextNumbers = [...numbers];
+      while (nextNumbers.length < 12) nextNumbers.push(randomTicket());
+      setWheelNumbers(nextNumbers);
+      setRollingNumber(nextNumbers[Math.floor(Math.random() * nextNumbers.length)]);
+    };
+    shuffleDisplay();
+    const numberInterval = window.setInterval(shuffleDisplay, 110);
     setRotation((current) => current + 1440 + (360 - (nextWinner % 12) * 30));
     window.setTimeout(() => {
+      window.clearInterval(numberInterval);
+      setWheelNumbers((current) => [nextWinner, ...current.filter((number) => number !== nextWinner)].slice(0, 12));
+      setRollingNumber(nextWinner);
       setWinner(nextWinner);
       setSpinning(false);
     }, 4300);
@@ -195,9 +211,9 @@ export default function Home() {
           <div className="wheel-wrap">
             <div className="wheel-pointer" />
             <div className="premium-wheel" style={{ transform: `rotate(${rotation}deg)` }}>
-              {Array.from({ length: 12 }, (_, index) => <span style={{ transform: `rotate(${index * 30}deg) translateY(-128px)` }} key={index}>{index + 1}</span>)}
+              {wheelNumbers.map((number, index) => <span style={{ transform: `rotate(${index * 30}deg) translateY(-128px)` }} key={`${index}-${number}`}>{String(number).padStart(3, "0")}</span>)}
             </div>
-            <div className="wheel-hub"><small>Vereins</small><strong>GLÜCK</strong></div>
+            <div className="wheel-hub"><small>{spinning ? "Los läuft" : winner ? "Gewinner" : "Vereinsglück"}</small><strong>{rollingNumber ? String(rollingNumber).padStart(3, "0") : "START"}</strong></div>
           </div>
           <div className="winner-card">
             <span>Das Gewinnerlos</span>
