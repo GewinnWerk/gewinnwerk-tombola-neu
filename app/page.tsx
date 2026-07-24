@@ -3,7 +3,7 @@
 
 import Link from "next/link";
 import { CSSProperties, useEffect, useMemo, useState } from "react";
-import { defaultConfig, readConfig, TombolaConfig } from "../lib/tombola-config";
+import { defaultConfig, readConfig, readOrders, saveOrders, TombolaConfig, TombolaOrder } from "../lib/tombola-config";
 
 const sold = new Set([1, 2, 5, 8, 11, 14, 17, 21, 26, 31, 34, 38, 41, 44, 47, 53, 57, 62]);
 
@@ -28,6 +28,9 @@ export default function Home() {
   const [rotation, setRotation] = useState(0);
   const [rollingNumber, setRollingNumber] = useState<number | null>(null);
   const [wheelNumbers, setWheelNumbers] = useState<number[]>([7, 18, 23, 31, 42, 56, 64, 71, 78, 84, 91, 99]);
+  const [checkoutOpen, setCheckoutOpen] = useState(false);
+  const [customer, setCustomer] = useState({ name: "", email: "" });
+  const [purchaseResult, setPurchaseResult] = useState<TombolaOrder | null>(null);
   const visibleTickets = Math.min(config.totalTickets, showAll ? config.totalTickets : 64);
   const ticketNumbers = useMemo(() => Array.from({ length: visibleTickets }, (_, index) => index + 1), [visibleTickets]);
   const total = selected.length * config.ticketPrice;
@@ -84,6 +87,29 @@ export default function Home() {
         setSpinning(false);
       }, 4300);
     }, 1800);
+  }
+
+  function completeDemoPayment() {
+    const name = customer.name.trim();
+    const email = customer.email.trim();
+    if (name.length < 2 || !email.includes("@") || !selected.length) return;
+    const instantWins = selected.flatMap((ticket) => {
+      const range = config.instantPrizeRanges.find((item) => ticket >= item.from && ticket <= item.to);
+      return range ? [{ ticket, prize: range.prize }] : [];
+    });
+    const order: TombolaOrder = {
+      id: `DEMO-${Date.now()}`,
+      name,
+      email,
+      tickets: [...selected],
+      amount: total,
+      status: "demo_paid",
+      paidAt: new Date().toISOString(),
+      instantWins,
+    };
+    saveOrders([order, ...readOrders()]);
+    setPurchaseResult(order);
+    setCheckoutOpen(false);
   }
 
   return (
@@ -190,7 +216,7 @@ export default function Home() {
             {config.totalTickets > 64 && <button className="show-more" onClick={() => setShowAll((value) => !value)}>{showAll ? "Weniger anzeigen" : `Alle ${config.totalTickets.toLocaleString("de-DE")} Lose anzeigen`}</button>}
             <div className="checkout">
               <div><span>{selected.length} Lose</span><strong>{total.toLocaleString("de-DE", { style: "currency", currency: "EUR" })}</strong></div>
-              <button disabled={!selected.length}>Weiter zur Zahlung <Icon name="arrow" /></button>
+              <button disabled={!selected.length} onClick={() => setCheckoutOpen(true)}>Weiter zur Zahlung <Icon name="arrow" /></button>
             </div>
             <p className="demo-note">Demo: Die echte Zahlung wird erst nach Einrichtung des Vereinskontos aktiviert.</p>
           </div>
@@ -246,6 +272,32 @@ export default function Home() {
           <article><b>3</b><h3>Mitfiebern</h3><p>Bestätigung erhalten und bei der Ziehung dabei sein.</p></article>
         </div>
       </section>
+
+      {checkoutOpen && <div className="checkout-modal" role="dialog" aria-modal="true" aria-labelledby="checkout-title">
+        <div className="checkout-dialog">
+          <button className="modal-close" onClick={() => setCheckoutOpen(false)} aria-label="Schließen">×</button>
+          <span className="eyebrow">Persönliche Losbestätigung</span>
+          <h2 id="checkout-title">Fast geschafft.</h2>
+          <p>Damit der Verein einen Gewinn zuordnen kann, brauchen wir Name und E‑Mail-Adresse.</p>
+          <label>Name<input value={customer.name} onChange={(event) => setCustomer({ ...customer, name: event.target.value })} placeholder="Vor- und Nachname" autoComplete="name" /></label>
+          <label>E‑Mail-Adresse<input type="email" value={customer.email} onChange={(event) => setCustomer({ ...customer, email: event.target.value })} placeholder="name@beispiel.de" autoComplete="email" /></label>
+          <div className="checkout-summary"><span>{selected.length} Lose: {selected.map((number) => String(number).padStart(3, "0")).join(", ")}</span><strong>{total.toLocaleString("de-DE", { style: "currency", currency: "EUR" })}</strong></div>
+          <button className="demo-pay-button" disabled={customer.name.trim().length < 2 || !customer.email.includes("@")} onClick={completeDemoPayment}>Demozahlung bestätigen</button>
+          <small>Demo-Modus: Es wird kein Geld abgebucht. Im Livebetrieb führt dieser Schritt zum Mollie-Konto des Vereins.</small>
+        </div>
+      </div>}
+
+      {purchaseResult && <div className="checkout-modal" role="dialog" aria-modal="true" aria-labelledby="result-title">
+        <div className="checkout-dialog result-dialog">
+          <button className="modal-close" onClick={() => setPurchaseResult(null)} aria-label="Schließen">×</button>
+          <span className="eyebrow">Zahlung bestätigt · Demo</span>
+          <h2 id="result-title">{purchaseResult.instantWins.length ? "Sofort gewonnen!" : "Du bist im Lostopf."}</h2>
+          {purchaseResult.instantWins.length ? <div className="instant-win-list">{purchaseResult.instantWins.map((win) => <div key={win.ticket}><b>Los {String(win.ticket).padStart(3, "0")}</b><strong>{win.prize}</strong></div>)}</div> : <p>Deine Lose haben keinen Sofortgewinn. Sie nehmen weiterhin an der Hauptpreisziehung teil.</p>}
+          <div className="main-draw-note"><span>Hauptpreis</span><strong>{config.mainPrizeTitle}</strong><small>Ziehung: {config.eventDate}, {config.drawTime}</small></div>
+          <p className="order-reference">Vorgang: {purchaseResult.id} · gespeichert für {purchaseResult.email}</p>
+          <button className="demo-pay-button" onClick={() => setPurchaseResult(null)}>Fertig</button>
+        </div>
+      </div>}
 
       <footer>
         <a className="brand" href="#"><span className="brand-mark"><Icon name="ticket" /></span><span>Vereins<span>glück</span></span></a>

@@ -11,9 +11,32 @@ export type TombolaConfig = {
   logoDataUrl: string;
   prizes: Array<{ title: string; value: string }>;
   sponsors: Array<{ name: string; logoUrl: string }>;
+  instantPrizeRanges: Array<{ from: number; to: number; prize: string }>;
+  mainPrizeTitle: string;
+};
+
+export type TombolaOrder = {
+  id: string;
+  name: string;
+  email: string;
+  tickets: number[];
+  amount: number;
+  status: "demo_paid" | "paid";
+  paidAt: string;
+  instantWins: Array<{ ticket: number; prize: string }>;
+};
+
+export type MainDrawResult = {
+  ticket: number;
+  prize: string;
+  drawnAt: string;
+  name: string;
+  email: string;
 };
 
 export const CONFIG_STORAGE_KEY = "vereinsglueck-config-v1";
+export const ORDER_STORAGE_KEY = "vereinsglueck-orders-v1";
+export const MAIN_DRAW_STORAGE_KEY = "vereinsglueck-main-draw-v1";
 
 export const defaultConfig: TombolaConfig = {
   associationName: "Beispielverein e. V.",
@@ -38,6 +61,12 @@ export const defaultConfig: TombolaConfig = {
     { name: "Regionale Partner", logoUrl: "" },
     { name: "Freunde des Vereins", logoUrl: "" },
   ],
+  instantPrizeRanges: [
+    { from: 10, to: 20, prize: "Restaurant-Gutschein" },
+    { from: 21, to: 30, prize: "Freizeit-Gutschein" },
+    { from: 31, to: 40, prize: "Überraschungspaket" },
+  ],
+  mainPrizeTitle: "Familien-Erlebnistag",
 };
 
 export function readConfig(): TombolaConfig {
@@ -52,6 +81,7 @@ export function readConfig(): TombolaConfig {
       ...saved,
       prizes: normalizedPrizes,
       sponsors: Array.isArray(saved.sponsors) ? saved.sponsors.slice(0, 20) : defaultConfig.sponsors,
+      instantPrizeRanges: Array.isArray(saved.instantPrizeRanges) ? saved.instantPrizeRanges.slice(0, 20) : defaultConfig.instantPrizeRanges,
     };
   } catch {
     return defaultConfig;
@@ -61,4 +91,33 @@ export function readConfig(): TombolaConfig {
 export function saveConfig(config: TombolaConfig) {
   window.localStorage.setItem(CONFIG_STORAGE_KEY, JSON.stringify(config));
   window.dispatchEvent(new Event("vereinsglueck-config"));
+}
+
+export function readOrders(): TombolaOrder[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const orders = JSON.parse(window.localStorage.getItem(ORDER_STORAGE_KEY) || "[]");
+    return Array.isArray(orders) ? orders : [];
+  } catch {
+    return [];
+  }
+}
+
+export function saveOrders(orders: TombolaOrder[]) {
+  window.localStorage.setItem(ORDER_STORAGE_KEY, JSON.stringify(orders));
+  window.dispatchEvent(new Event("vereinsglueck-orders"));
+}
+
+export function readMainDraw(): MainDrawResult | null {
+  if (typeof window === "undefined") return null;
+  try {
+    return JSON.parse(window.localStorage.getItem(MAIN_DRAW_STORAGE_KEY) || "null");
+  } catch {
+    return null;
+  }
+}
+
+export function saveMainDraw(result: MainDrawResult) {
+  window.localStorage.setItem(MAIN_DRAW_STORAGE_KEY, JSON.stringify(result));
+  window.dispatchEvent(new Event("vereinsglueck-orders"));
 }

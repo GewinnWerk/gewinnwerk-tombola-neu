@@ -13,11 +13,12 @@ Stand: 24. Juli 2026
 | Ziehungsanimation | einfache Hunde-/Lotto-Sequenz | professionelles Glücksrad mit Gewinnerinszenierung | umgesetzt als Vorführmodus |
 | Admin-PIN und Rollen | lokale PIN/Master-PIN | noch nicht sicher angebunden | offen |
 | Mollie-Zahlung | altes Render-Backend | gehärteter Firebase-Funktionskern | Oberfläche noch nicht verbunden |
-| Meine Lose / Gewinnstatus | vorhanden | noch nicht angebunden | offen |
+| Käuferdaten / Gewinnstatus | Name und lokale Prüfung | Name, E-Mail, Demozahlung, Sofortgewinn und gespeicherter Vorgang | lokal umgesetzt, Mollie-Anbindung offen |
 | Verkaufsstart/-stopp | vorhanden | noch nicht angebunden | offen |
-| Verkaufsstatistik und Tabelle | vorhanden | noch nicht angebunden | offen |
+| Verkaufsstatistik und Tabelle | vorhanden | Admin-Betriebsansicht mit Zahlungen, Losen und Sofortgewinnen | lokal umgesetzt, Firestore offen |
 | QR-Plakat und Druck | vorhanden | noch nicht neu umgesetzt | offen |
 | Live-Screen und Musik | vorhanden | Ziehungsbühne vorhanden, Automatik/Musik offen | teilweise |
+| Hauptpreis-Gewinner | einfache Ziehung | Losnummer, Käufer, E-Mail und Zeitstempel gespeichert abrufbar | lokal umgesetzt, Firestore offen |
 | Datenexport/-import | lokales JSON | noch nicht neu umgesetzt | offen |
 | Rechtstexte | eingebettete Entwürfe | Businessplan nennt Pflicht; Seiten fehlen | offen |
 | Mandantentrennung | nicht belastbar | Zielarchitektur dokumentiert | vor Livebetrieb umzusetzen |

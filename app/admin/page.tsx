@@ -3,17 +3,24 @@
 
 import Link from "next/link";
 import { ChangeEvent, CSSProperties, useEffect, useState } from "react";
-import { defaultConfig, readConfig, saveConfig, TombolaConfig } from "../../lib/tombola-config";
+import { defaultConfig, MainDrawResult, readConfig, readMainDraw, readOrders, saveConfig, saveMainDraw, TombolaConfig, TombolaOrder } from "../../lib/tombola-config";
 
-const steps = ["Verein", "Tombola", "Gewinne", "Sponsoren", "Vorschau"];
+const steps = ["Verein", "Tombola", "Gewinne", "Sponsoren", "Vorschau", "Betrieb"];
 
 export default function AdminPage() {
   const [config, setConfig] = useState<TombolaConfig>(defaultConfig);
   const [activeStep, setActiveStep] = useState(0);
   const [saved, setSaved] = useState(false);
+  const [orders, setOrders] = useState<TombolaOrder[]>([]);
+  const [mainDraw, setMainDraw] = useState<MainDrawResult | null>(null);
+  const [winnerInput, setWinnerInput] = useState("");
 
   useEffect(() => {
-    const frame = window.requestAnimationFrame(() => setConfig(readConfig()));
+    const frame = window.requestAnimationFrame(() => {
+      setConfig(readConfig());
+      setOrders(readOrders());
+      setMainDraw(readMainDraw());
+    });
     return () => window.cancelAnimationFrame(frame);
   }, []);
 
@@ -29,6 +36,28 @@ export default function AdminPage() {
 
   function updateSponsor(index: number, key: "name" | "logoUrl", value: string) {
     update("sponsors", config.sponsors.map((sponsor, sponsorIndex) => sponsorIndex === index ? { ...sponsor, [key]: value } : sponsor));
+  }
+
+  function updateRange(index: number, key: "from" | "to" | "prize", value: string) {
+    update("instantPrizeRanges", config.instantPrizeRanges.map((range, rangeIndex) => rangeIndex === index ? { ...range, [key]: key === "prize" ? value : Number(value) } : range));
+  }
+
+  function storeMainWinner() {
+    const ticket = Number(winnerInput);
+    if (!Number.isInteger(ticket) || ticket < 1 || ticket > config.totalTickets) {
+      window.alert(`Bitte eine Losnummer zwischen 1 und ${config.totalTickets} eingeben.`);
+      return;
+    }
+    const order = orders.find((item) => item.tickets.includes(ticket));
+    const result: MainDrawResult = {
+      ticket,
+      prize: config.mainPrizeTitle,
+      drawnAt: new Date().toISOString(),
+      name: order?.name || "Noch keinem bezahlten Los zugeordnet",
+      email: order?.email || "",
+    };
+    saveMainDraw(result);
+    setMainDraw(result);
   }
 
   function handleLogo(event: ChangeEvent<HTMLInputElement>) {
@@ -63,7 +92,7 @@ export default function AdminPage() {
         <nav aria-label="Einrichtungsschritte">
           {steps.map((step, index) => (
             <button className={activeStep === index ? "active" : ""} onClick={() => setActiveStep(index)} key={step}>
-              <b>{index + 1}</b><span>{step}<small>{index === 0 ? "Name, Logo & Farben" : index === 1 ? "Lose, Preis & Termin" : index === 2 ? "Preise bearbeiten" : index === 3 ? "Partner & Logos" : "Alles kontrollieren"}</small></span>
+              <b>{index + 1}</b><span>{step}<small>{index === 0 ? "Name, Logo & Farben" : index === 1 ? "Lose, Preis & Termin" : index === 2 ? "Preise & Nummernbereiche" : index === 3 ? "Partner & Logos" : index === 4 ? "Alles kontrollieren" : "Verkäufe & Gewinner"}</small></span>
             </button>
           ))}
         </nav>
@@ -72,7 +101,7 @@ export default function AdminPage() {
 
       <section className="admin-main">
         <header className="admin-topbar">
-          <div><span className="admin-kicker">Einrichtung · Schritt {activeStep + 1} von 5</span><h1>{steps[activeStep]}</h1></div>
+          <div><span className="admin-kicker">Einrichtung · Schritt {activeStep + 1} von 6</span><h1>{steps[activeStep]}</h1></div>
           <div className="admin-top-actions"><Link href="/" target="_blank">Kundenseite öffnen ↗</Link><button className="save-button" onClick={persist}>{saved ? "✓ Gespeichert" : "Änderungen speichern"}</button></div>
         </header>
 
@@ -104,6 +133,11 @@ export default function AdminPage() {
               {config.prizes.map((prize, index) => <div className="prize-admin-row" key={index}><b>{index + 1}</b><label>Gewinn<input value={prize.title} onChange={(e) => updatePrize(index, "title", e.target.value)} /></label><label>Wert / Zusatz<input value={prize.value} onChange={(e) => updatePrize(index, "value", e.target.value)} /></label></div>)}
               <button className="add-sponsor-button" disabled={config.prizes.length >= 12} onClick={() => update("prizes", [...config.prizes, { title: "", value: "" }])}>+ Weiteren Gewinn hinzufügen</button>
               <p className="field-hint">{config.prizes.length} von maximal 12 Gewinnfeldern</p>
+              <h3 className="admin-subheading">Sofortgewinne nach Losnummer</h3>
+              <p className="field-hint">Beispiel: Lose 10 bis 20 erhalten sofort denselben Preis. Der Hauptpreis bleibt davon getrennt.</p>
+              {config.instantPrizeRanges.map((range, index) => <div className="range-row" key={index}><label>Von<input type="number" min="1" max={config.totalTickets} value={range.from} onChange={(event) => updateRange(index, "from", event.target.value)} /></label><label>Bis<input type="number" min="1" max={config.totalTickets} value={range.to} onChange={(event) => updateRange(index, "to", event.target.value)} /></label><label>Preis<input value={range.prize} onChange={(event) => updateRange(index, "prize", event.target.value)} /></label><button onClick={() => update("instantPrizeRanges", config.instantPrizeRanges.filter((_, rangeIndex) => rangeIndex !== index))}>×</button></div>)}
+              <button className="add-sponsor-button" disabled={config.instantPrizeRanges.length >= 20} onClick={() => update("instantPrizeRanges", [...config.instantPrizeRanges, { from: 1, to: 1, prize: "" }])}>+ Nummernbereich hinzufügen</button>
+              <label className="main-prize-input">Hauptpreis für die spätere Ziehung<input value={config.mainPrizeTitle} onChange={(event) => update("mainPrizeTitle", event.target.value)} /></label>
             </>}
 
             {activeStep === 3 && <>
@@ -128,7 +162,19 @@ export default function AdminPage() {
               <div className="review-notice">Die Konfiguration ist lokal gespeichert. Eine Veröffentlichung oder echte Zahlung wird dadurch noch nicht ausgelöst.</div>
             </>}
 
-            <div className="form-footer"><button className="reset-button" onClick={reset}>Demo-Werte wiederherstellen</button><div><button disabled={activeStep === 0} onClick={() => setActiveStep((step) => step - 1)}>Zurück</button>{activeStep < 4 ? <button className="next-button" onClick={() => setActiveStep((step) => step + 1)}>Weiter</button> : <button className="next-button" onClick={persist}>Speichern & abschließen</button>}</div></div>
+            {activeStep === 5 && <>
+              <div className="form-heading"><span>06</span><div><h2>Verkäufe und Gewinner</h2><p>Gespeicherte Demo-/Live-Zahlungen und Hauptgewinner abrufen.</p></div></div>
+              <div className="operation-stats"><div><strong>{orders.length}</strong><span>Zahlungen</span></div><div><strong>{orders.reduce((sum, order) => sum + order.tickets.length, 0)}</strong><span>bezahlte Lose</span></div><div><strong>{orders.reduce((sum, order) => sum + order.instantWins.length, 0)}</strong><span>Sofortgewinne</span></div></div>
+              <div className="main-draw-admin">
+                <span>Hauptpreisziehung · {config.eventDate}, {config.drawTime}</span>
+                <h3>{config.mainPrizeTitle}</h3>
+                <div><input type="number" min="1" max={config.totalTickets} value={winnerInput} onChange={(event) => setWinnerInput(event.target.value)} placeholder="Gewinnerlos, z. B. 23" /><button onClick={storeMainWinner}>Gewinner speichern</button></div>
+                {mainDraw && <div className="stored-winner"><small>Gespeicherter Hauptgewinner</small><strong>Los {String(mainDraw.ticket).padStart(3, "0")} · {mainDraw.name}</strong><span>{mainDraw.email || "Keine E-Mail zugeordnet"} · {new Date(mainDraw.drawnAt).toLocaleString("de-DE")}</span></div>}
+              </div>
+              <div className="order-list"><h3>Gespeicherte Vorgänge</h3>{orders.length ? orders.map((order) => <article key={order.id}><div><strong>{order.name}</strong><span>{order.email}</span></div><div><strong>{order.tickets.map((ticket) => String(ticket).padStart(3, "0")).join(", ")}</strong><span>{order.instantWins.length ? order.instantWins.map((win) => `${win.ticket}: ${win.prize}`).join(" · ") : "Kein Sofortgewinn"}</span></div><small>{order.status === "demo_paid" ? "Demo" : "Bezahlt"} · {new Date(order.paidAt).toLocaleString("de-DE")}</small></article>) : <p className="empty-orders">Noch keine Zahlungen gespeichert.</p>}</div>
+            </>}
+
+            <div className="form-footer"><button className="reset-button" onClick={reset}>Demo-Werte wiederherstellen</button><div><button disabled={activeStep === 0} onClick={() => setActiveStep((step) => step - 1)}>Zurück</button>{activeStep < 5 ? <button className="next-button" onClick={() => setActiveStep((step) => step + 1)}>Weiter</button> : <button className="next-button" onClick={persist}>Speichern</button>}</div></div>
           </div>
 
           <aside className="live-preview">
