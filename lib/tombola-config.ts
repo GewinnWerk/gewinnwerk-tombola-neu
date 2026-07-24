@@ -30,6 +30,9 @@ export const defaultConfig: TombolaConfig = {
     { title: "Familien-Erlebnistag", value: "Wert 250 €" },
     { title: "Genusskorb aus der Region", value: "Wert 120 €" },
     { title: "Vereins-Fanpaket", value: "Wert 75 €" },
+    { title: "Restaurant-Gutschein", value: "Wert 60 €" },
+    { title: "Freizeit-Gutschein", value: "Wert 40 €" },
+    { title: "Überraschungspaket", value: "Wert 25 €" },
   ],
   sponsors: [
     { name: "Regionale Partner", logoUrl: "" },
@@ -41,10 +44,13 @@ export function readConfig(): TombolaConfig {
   if (typeof window === "undefined") return defaultConfig;
   try {
     const saved = JSON.parse(window.localStorage.getItem(CONFIG_STORAGE_KEY) || "");
+    const savedPrizes = Array.isArray(saved.prizes) ? saved.prizes.slice(0, 12) : [];
+    const normalizedPrizes = [...savedPrizes];
+    while (normalizedPrizes.length < 6) normalizedPrizes.push(defaultConfig.prizes[normalizedPrizes.length]);
     return {
       ...defaultConfig,
       ...saved,
-      prizes: Array.isArray(saved.prizes) ? saved.prizes.slice(0, 3) : defaultConfig.prizes,
+      prizes: normalizedPrizes,
       sponsors: Array.isArray(saved.sponsors) ? saved.sponsors.slice(0, 20) : defaultConfig.sponsors,
     };
   } catch {

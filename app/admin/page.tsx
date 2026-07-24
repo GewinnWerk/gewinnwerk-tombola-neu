@@ -100,8 +100,10 @@ export default function AdminPage() {
             </>}
 
             {activeStep === 2 && <>
-              <div className="form-heading"><span>03</span><div><h2>Die drei Hauptgewinne</h2><p>Kurze, verständliche Namen wirken auf dem Handy am besten.</p></div></div>
+              <div className="form-heading"><span>03</span><div><h2>Deine Gewinne</h2><p>Mindestens sechs Felder stehen bereit. Kurze Namen wirken auf dem Handy am besten.</p></div></div>
               {config.prizes.map((prize, index) => <div className="prize-admin-row" key={index}><b>{index + 1}</b><label>Gewinn<input value={prize.title} onChange={(e) => updatePrize(index, "title", e.target.value)} /></label><label>Wert / Zusatz<input value={prize.value} onChange={(e) => updatePrize(index, "value", e.target.value)} /></label></div>)}
+              <button className="add-sponsor-button" disabled={config.prizes.length >= 12} onClick={() => update("prizes", [...config.prizes, { title: "", value: "" }])}>+ Weiteren Gewinn hinzufügen</button>
+              <p className="field-hint">{config.prizes.length} von maximal 12 Gewinnfeldern</p>
             </>}
 
             {activeStep === 3 && <>

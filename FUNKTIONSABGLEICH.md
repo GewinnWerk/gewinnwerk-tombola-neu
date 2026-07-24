@@ -7,7 +7,7 @@ Stand: 24. Juli 2026
 | Vereinsname, Zweck, Logo und Farben | vorhanden | geführter Admin mit Live-Vorschau | umgesetzt |
 | Veranstaltung, Datum und Ziehungszeit | vorhanden | geführter Admin | umgesetzt |
 | Lospreis und Losanzahl | Preis und Gewinnintervall | Preis und 20–5.000 Lose | umgesetzt |
-| Gewinne | JSON-Eingabe | drei verständliche Formularzeilen | umgesetzt |
+| Gewinne | JSON-Eingabe | mindestens sechs, bis zu zwölf verständliche Formularzeilen | umgesetzt |
 | Sponsoren | Namen oder Bild-URLs | bis zu 20 Namen/Logo-URLs plus Laufband | umgesetzt |
 | Kundenseite | einzelne HTML-App | moderne responsive Next.js-Seite | umgesetzt |
 | Ziehungsanimation | einfache Hunde-/Lotto-Sequenz | professionelles Glücksrad mit Gewinnerinszenierung | umgesetzt als Vorführmodus |

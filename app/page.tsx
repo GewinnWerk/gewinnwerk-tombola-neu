@@ -148,9 +148,9 @@ export default function Home() {
         </div>
         <div className="prize-grid">
           {config.prizes.map((prize, index) => (
-            <article className={`prize-card ${["gold", "coral", "blue"][index]}`} key={`${prize.title}-${index}`}>
+            <article className={`prize-card ${["gold", "coral", "blue"][index % 3]}`} key={`${prize.title}-${index}`}>
               <span className="prize-number">0{index + 1}</span>
-              <div className="prize-visual">{index === 0 ? "✦" : index === 1 ? "◒" : "◆"}</div>
+              <div className="prize-visual">{["✦", "◒", "◆", "●", "◇", "✷"][index % 6]}</div>
               <span>{index === 0 ? "Hauptgewinn" : `${index + 1}. Preis`}</span>
               <h3>{prize.title}</h3>
               <small>{prize.value}</small>
