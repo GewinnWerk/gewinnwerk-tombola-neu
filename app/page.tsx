@@ -74,7 +74,8 @@ export default function Home() {
       setSpinning(true);
       shuffleDisplay();
       const numberInterval = window.setInterval(shuffleDisplay, 90);
-      setRotation((current) => current + 1800 + (360 - (nextWinner % 12) * 30));
+      const alignedRotation = rotation + 1800 + ((360 - (rotation % 360)) % 360);
+      setRotation(alignedRotation);
       window.setTimeout(() => {
         window.clearInterval(numberInterval);
         setWheelNumbers((current) => [nextWinner, ...current.filter((number) => number !== nextWinner)].slice(0, 12));
