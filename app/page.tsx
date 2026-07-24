@@ -23,6 +23,7 @@ export default function Home() {
   const [selected, setSelected] = useState<number[]>([7, 23]);
   const [showAll, setShowAll] = useState(false);
   const [spinning, setSpinning] = useState(false);
+  const [countdown, setCountdown] = useState<number | null>(null);
   const [winner, setWinner] = useState<number | null>(null);
   const [rotation, setRotation] = useState(0);
   const [rollingNumber, setRollingNumber] = useState<number | null>(null);
@@ -51,11 +52,14 @@ export default function Home() {
   }
 
   function startWheel() {
-    if (spinning) return;
+    if (spinning || countdown !== null) return;
     const pool = selected.length ? selected : [7, 23, 39, 56];
     const nextWinner = pool[Math.floor(Math.random() * pool.length)];
     setWinner(null);
-    setSpinning(true);
+    setRollingNumber(null);
+    setCountdown(3);
+    window.setTimeout(() => setCountdown(2), 600);
+    window.setTimeout(() => setCountdown(1), 1200);
     const randomTicket = () => Math.floor(Math.random() * config.totalTickets) + 1;
     const shuffleDisplay = () => {
       const numbers = new Set<number>();
@@ -65,16 +69,20 @@ export default function Home() {
       setWheelNumbers(nextNumbers);
       setRollingNumber(nextNumbers[Math.floor(Math.random() * nextNumbers.length)]);
     };
-    shuffleDisplay();
-    const numberInterval = window.setInterval(shuffleDisplay, 110);
-    setRotation((current) => current + 1440 + (360 - (nextWinner % 12) * 30));
     window.setTimeout(() => {
-      window.clearInterval(numberInterval);
-      setWheelNumbers((current) => [nextWinner, ...current.filter((number) => number !== nextWinner)].slice(0, 12));
-      setRollingNumber(nextWinner);
-      setWinner(nextWinner);
-      setSpinning(false);
-    }, 4300);
+      setCountdown(null);
+      setSpinning(true);
+      shuffleDisplay();
+      const numberInterval = window.setInterval(shuffleDisplay, 90);
+      setRotation((current) => current + 1800 + (360 - (nextWinner % 12) * 30));
+      window.setTimeout(() => {
+        window.clearInterval(numberInterval);
+        setWheelNumbers((current) => [nextWinner, ...current.filter((number) => number !== nextWinner)].slice(0, 12));
+        setRollingNumber(nextWinner);
+        setWinner(nextWinner);
+        setSpinning(false);
+      }, 4300);
+    }, 1800);
   }
 
   return (
@@ -202,12 +210,15 @@ export default function Home() {
           <h2>Eine Ziehung, bei der alle hinschauen.</h2>
           <p>Das Glücksrad mischt die gewählten Losnummern und setzt den Gewinner anschließend eindrucksvoll in Szene – für Beamer, Großbildschirm und Smartphone.</p>
           <div className="draw-features"><span>Live auf Großbild</span><span>Faire Zufallsauswahl</span><span>Gewinner klar sichtbar</span></div>
-          <button className="draw-button" onClick={startWheel} disabled={spinning}>{spinning ? "Die Lose werden gemischt …" : winner ? "Noch einmal vorführen" : "Demo-Ziehung starten"} <Icon name="arrow" /></button>
+          <button className="draw-button" onClick={startWheel} disabled={spinning || countdown !== null}>{countdown !== null ? `Start in ${countdown} …` : spinning ? "Die Lose rasen durchs Rad …" : winner ? "Show noch einmal starten" : "Große Ziehung starten"} <Icon name="arrow" /></button>
           <small className="draw-demo-note">Vorführmodus – es wird kein echtes Gewinnerlos gespeichert.</small>
         </div>
-        <div className={`draw-stage ${spinning ? "is-spinning" : ""} ${winner ? "has-winner" : ""}`}>
+        <div className={`draw-stage ${countdown !== null ? "is-counting" : ""} ${spinning ? "is-spinning" : ""} ${winner ? "has-winner" : ""}`}>
           <div className="stage-light light-one" /><div className="stage-light light-two" />
-          <div className="draw-status"><i /><span>{spinning ? "Ziehung läuft" : winner ? "Gewinner gezogen" : "Bereit für die Ziehung"}</span></div>
+          <div className="show-banner"><b>LIVE</b><span>VEREINSGLÜCK · GROSSE ZIEHUNG</span></div>
+          <div className="draw-status"><i /><span>{countdown !== null ? "Show startet" : spinning ? "Ziehung läuft" : winner ? "Gewinner gezogen" : "Bereit für die Ziehung"}</span></div>
+          <div className="energy-ring ring-one" /><div className="energy-ring ring-two" /><div className="energy-ring ring-three" />
+          {countdown !== null && <div className="countdown-overlay"><span>{countdown}</span><small>Mach dich bereit</small></div>}
           <div className="wheel-wrap">
             <div className="wheel-pointer" />
             <div className="premium-wheel" style={{ transform: `rotate(${rotation}deg)` }}>
@@ -220,6 +231,7 @@ export default function Home() {
             <strong>{winner ? String(winner).padStart(3, "0") : "— — —"}</strong>
             <small>{winner ? "Herzlichen Glückwunsch!" : "Wird gleich gezogen"}</small>
           </div>
+          <div className="winner-burst"><span>GEWINNER</span></div>
           <div className="stage-particles">{Array.from({ length: 14 }, (_, index) => <i key={index} />)}</div>
         </div>
       </section>
