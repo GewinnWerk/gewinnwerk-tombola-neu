@@ -1,6 +1,6 @@
 # Funktionsabgleich mit der Vorgängerversion
 
-Stand: 24. Juli 2026
+Stand: 25. Juli 2026
 
 | Bereich | Alte Version | Neuer Stand | Status |
 |---|---|---|---|
@@ -12,7 +12,7 @@ Stand: 24. Juli 2026
 | Kundenseite | einzelne HTML-App | moderne responsive Next.js-Seite | umgesetzt |
 | Ziehungsanimation | einfache Hunde-/Lotto-Sequenz | professionelles Glücksrad mit Gewinnerinszenierung | umgesetzt als Vorführmodus |
 | Admin-PIN und Rollen | lokale PIN/Master-PIN | noch nicht sicher angebunden | offen |
-| Mollie-Zahlung | altes Render-Backend | gehärteter Firebase-Funktionskern | Oberfläche noch nicht verbunden |
+| Mollie-Zahlung | altes Render-Backend | Firebase-Funktionsprototyp; Sollzustand ist Mollie Connect/OAuth je Verein ohne Platform-Anteil am Losumsatz | globale Schlüsselverwendung gesperrt, Connect noch offen |
 | Käuferdaten / Gewinnstatus | Name und lokale Prüfung | Name, E-Mail, Demozahlung, Sofortgewinn und gespeicherter Vorgang | lokal umgesetzt, Mollie-Anbindung offen |
 | Verkaufsstart/-stopp | vorhanden | noch nicht angebunden | offen |
 | Verkaufsstatistik und Tabelle | vorhanden | Admin-Betriebsansicht mit Zahlungen, Losen und Sofortgewinnen | lokal umgesetzt, Firestore offen |

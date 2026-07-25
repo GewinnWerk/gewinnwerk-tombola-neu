@@ -1,6 +1,6 @@
 # Technischer Status
 
-Stand: 24. Juli 2026
+Stand: 25. Juli 2026
 
 ## Lokal geprüft
 
@@ -17,16 +17,15 @@ Stand: 24. Juli 2026
 
 - Oberfläche nutzt derzeit Demo-Daten statt Firestore
 - Zahlungsbutton startet bewusst keine echte Zahlung
-- kein nachgewiesenes Git-Repository in diesem Ordner
 - keine Firebase-Projektdatei `.firebaserc`, keine Firestore Rules und kein Hosting-Ziel vorhanden
-- kein Zugriffstest auf ein Mollie-Konto und keine Testzahlung erfolgt
-- keine visuelle Browserabnahme möglich, weil in dieser Sitzung kein Browser bereitstand
+- Mollie-Konto und Entwicklerbereich wurden eingesehen; es wurde bewusst kein Token kopiert, erstellt oder verändert
+- keine Mollie-Testzahlung erfolgt
 
 ## Blocker vor Pilotbetrieb
 
 1. Mandanten- und Rollenmodell einschließlich Vereins-Admin
 2. Firestore Security Rules, App Check und Missbrauchsschutz
-3. getrennte Zahlungskonten je Verein statt eines globalen Plattformschlüssels
+3. Mollie-Connect-/OAuth-Anbindung pro Verein; der vorhandene globale `MOLLIE_API_KEY`-Prototyp darf nicht live verwendet werden
 4. Datenschutz-, Lösch-, Export- und Auftragsverarbeitungsprozess
 5. vollständige Testzahlung samt Webhook, Abbruch, Ablauf und Rückerstattung
 6. Rechts-/Steuercheck für Pilotbundesland und konkrete Vereinsveranstaltung

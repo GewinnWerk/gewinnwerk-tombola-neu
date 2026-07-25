@@ -1,6 +1,6 @@
 # Businessplan: Vereinsglück
 
-Stand: 24. Juli 2026 · Arbeitsfassung für Validierung und Pilotvereine
+Stand: 25. Juli 2026 · Arbeitsfassung für Validierung und Pilotvereine
 
 ## 1. Kurzfassung
 
@@ -48,7 +48,7 @@ Vereinsglück ist Softwaredienstleister, nicht Veranstalter und nicht Empfänger
 
 \* Ob Preise brutto oder netto ausgewiesen werden müssen, hängt von Unternehmensform, Kleinunternehmerstatus und Kundensituation ab und ist vor Verkaufsstart steuerlich festzulegen.
 
-Transaktionsgebühren werden vom Mollie-Konto des Vereins getragen und transparent vor Vertragsschluss genannt. Keine Beteiligung an Losumsätzen in der Pilotphase: Ein fixer Preis ist für Vereine planbar und hält die Rollen sauber.
+Transaktionsgebühren werden vom Mollie-Konto des Vereins getragen und transparent vor Vertragsschluss genannt. Vereinsglück erhält weder den Losumsatz noch eine automatische Provision oder Application Fee aus einzelnen Loszahlungen. Die Veranstaltungslizenz von 49 €, 99 € oder 249 € wird separat gegenüber dem Verein abgerechnet. So bleiben Loserlöse und Softwaremiete technisch und buchhalterisch getrennt.
 
 ### Beispielrechnung Jahr 1
 
@@ -100,7 +100,9 @@ Vor jedem Pilotbetrieb ist eine fachliche Prüfung notwendig. Wesentliche Leitpl
 
 - Öffentliche Lotterien und Ausspielungen fallen grundsätzlich unter das Rennwett- und Lotteriegesetz. Steuerbefreiungen setzen unter anderem behördliche Erlaubnis bzw. allgemeine Erlaubnis voraus; die konkreten Erlaubnisregeln kommen aus dem jeweiligen Landesrecht.
 - Der Verein ist als Veranstalter für Genehmigung/Anzeige, Teilnahmebedingungen, Jugendschutz, Gewinne, Ziehung und steuerliche Behandlung verantwortlich. Vereinsglück stellt Checklisten bereit, ersetzt aber keine Rechts- oder Steuerberatung.
-- Jeder Verein nutzt ein eigenes Mollie-Konto. Die Plattform speichert keinen gemeinsamen geheimen API-Schlüssel für mehrere Vereine.
+- Jeder Verein nutzt ein eigenes Mollie-Konto und bleibt Eigentümer der Zahlungen sowie Empfänger der Auszahlungen. Kein Losumsatz wird auf ein Mollie- oder Bankkonto von Vereinsglück geleitet.
+- Die Plattform verwendet Mollie Connect mit einer vom Verein freigegebenen OAuth-Verbindung. Sie speichert keinen gemeinsamen geheimen API-Schlüssel für mehrere Vereine und fordert Vereine nicht zur Weitergabe ihrer API-Schlüssel auf.
+- Die 49-/99-/249-Euro-Softwaremiete wird separat abgerechnet; bei Loszahlungen wird keine Application Fee und keine Umsatzbeteiligung einbehalten.
 - Personenbezogene Daten werden minimiert. Für einen Loskauf sollten Name und mindestens ein sicherer Kontaktweg genügen; optionale Felder werden entfernt.
 - Auftragsverarbeitungsvertrag, Löschkonzept, technische und organisatorische Maßnahmen, Datenschutzerklärung, Impressum, AGB/Leistungsbeschreibung und Haftungsgrenzen müssen vor dem ersten bezahlten Einsatz vorliegen.
 - Rückerstattungen, Stornierung, nicht stattfindende Ziehung und nicht abgeholte Gewinne brauchen klare Prozesse.
@@ -108,7 +110,7 @@ Vor jedem Pilotbetrieb ist eine fachliche Prüfung notwendig. Wesentliche Leitpl
 ## 8. Technischer Sollzustand vor Verkauf
 
 - Mandantentrennung pro Verein mit rollenbasiertem Adminzugang
-- eigenes Mollie-OAuth-/Connect-Konzept oder getrennte, sicher verwaltete Vereinsschlüssel
+- Mollie Connect für Plattformen mit OAuth pro Verein; keine Loszahlung über das Plattformkonto und keine manuell ausgetauschten Vereinsschlüssel
 - Firebase Security Rules, App Check, Rate Limits und Auditprotokoll
 - idempotente Webhooks, Betrags-/Währungsprüfung und automatisierte Rückabwicklung
 - Test-/Live-Trennung und vollständiger Ende-zu-Ende-Test
