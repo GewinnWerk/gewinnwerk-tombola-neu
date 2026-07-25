@@ -1,5 +1,11 @@
 # Vereinsglück
 
+## Eishockey-Produktreife 2026/27
+
+Die aktuelle Markt-, Compliance- und Technikbewertung steht in
+[`EISHOCKEY_MARKT_PRODUKTREIFE_2026.md`](./EISHOCKEY_MARKT_PRODUKTREIFE_2026.md).
+Der Stand ist eine geprüfte Demo und noch kein freigegebener Liveverkauf.
+
 Moderne digitale Tombola für kleine Vereine, Fördervereine und lokale Veranstaltungen.
 
 ## Lokaler Start

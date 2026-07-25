@@ -1,0 +1,34 @@
+{
+  "policy": "prepare_only",
+  "environment": "test",
+  "event": {
+    "id": "pilot-heimspiel",
+    "club": "Beispielverein",
+    "venue": "Beispiel-Eishalle",
+    "eventDate": null,
+    "salesEnd": null,
+    "drawTime": null,
+    "ticketPrice": null,
+    "ticketCount": null,
+    "authorityStatus": "needs_review",
+    "mollieMode": "test",
+    "screenMode": "projector",
+    "privacyMode": "ticket_number_only"
+  },
+  "simulation": {
+    "seed": "pilot-simulation-v1",
+    "tickets": [101, 102, 103, 104, 105]
+  },
+  "sources": [
+    {
+      "name": "BayernPortal Tombola",
+      "url": "https://www.bayernportal.de/dokumente/leistung/886653460284",
+      "status": "reviewed",
+      "reviewedAt": "2026-07-25"
+    }
+  ],
+  "draftOutreach": {
+    "enabled": false
+  },
+  "requestedActions": []
+}

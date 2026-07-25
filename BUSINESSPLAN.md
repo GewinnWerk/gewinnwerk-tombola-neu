@@ -6,18 +6,20 @@ Stand: 25. Juli 2026 · Arbeitsfassung für Validierung und Pilotvereine
 
 Vereinsglück ist eine tageweise mietbare, digitale Tombola für kleine Vereine und gemeinnützige Einrichtungen. Der Verein bleibt Veranstalter, stellt Preise und Veranstaltungspersonal, entscheidet über Teilnahmebedingungen und erhält die Loserlöse direkt auf sein eigenes Mollie-Konto. Vereinsglück stellt die Software, richtet die Veranstaltung ein und bietet optional Vor-Ort-Begleitung.
 
-Das Einstiegsangebot soll bewusst leicht verständlich sein:
+Das Einstiegsangebot soll bewusst leicht verständlich sein, die Preise sind aber noch nicht entschieden:
 
-- **Selbststarter – 49 € pro Veranstaltung:** personalisierte Tombolaseite, bis 300 Lose, QR-Code, Einweisung und Standard-Support.
-- **Vereinsfest – 99 € pro Veranstaltung:** bis 1.000 Lose, Einrichtung durch Vereinsglück, Gewinnliste, Testlauf, priorisierter Support am Veranstaltungstag und Abschluss-Export.
-- **Vor Ort – ab 249 € plus Fahrtkosten:** Leistungen aus Vereinsfest sowie Aufbau, Einweisung und bis zu vier Stunden Betreuung. Jede weitere Stunde 49 €.
+- **Selbstbedienung:** personalisierte Tombolaseite, QR-Code, Einweisung und Standard-Support.
+- **Begleiteter Heimspiel-Pilot:** gemeinsame Einrichtung, Compliance-Checkliste, Testlauf, Hallen-Generalprobe und Abschluss-Export.
+- **Saisonmodell:** wiederverwendbare Vereinsinstanz für mehrere freigegebene Heimspiele.
+- **Vor Ort:** Aufbau, Regie und Betreuung als optionale Zusatzleistung.
 
-Empfehlung: Nicht nach „halber Tag / ganzer Tag“ abrechnen, solange die Software automatisiert läuft. Das verständlichere Produkt ist eine Veranstaltungslizenz; nur persönliche Betreuung wird nach Zeit berechnet.
+Empfehlung: Erst Arbeitsaufwand und Pilotnutzen messen, dann Veranstaltungspauschale, Saisonlizenz und Vor-Ort-Satz manuell festlegen. Kein Preis wird automatisiert veröffentlicht oder geändert.
 
 ## 2. Zielkunden und Anlässe
 
-Erste Zielgruppe sind kleine Organisationen mit wiederkehrenden lokalen Festen:
+Erste Pilotzielgruppe für die Saison 2026/27 sind kleinere Eishockeyvereine im Allgäu und nahen Umfeld. Danach bleibt die Lösung auf weitere kleine Organisationen übertragbar:
 
+- Eishockeyvereine mit Heimspielen und Nachwuchsförderung
 - Freiwillige Feuerwehren und Feuerwehrvereine
 - Musik-, Sport-, Trachten- und Kulturvereine
 - Fördervereine von Schulen und Kindergärten
@@ -38,29 +40,21 @@ Vereinsglück ist Softwaredienstleister, nicht Veranstalter und nicht Empfänger
 
 ### Erlöse
 
-| Produkt | Preis netto* | Direkte Arbeitszeit | Zweck |
-|---|---:|---:|---|
-| Selbststarter | 49 € | ca. 20–30 Min. | niedrige Einstiegshürde |
-| Vereinsfest | 99 € | ca. 45–60 Min. | empfohlenes Kernprodukt |
-| Vor Ort | ab 249 € | bis 4 Std. | Premium und Vertrauensaufbau |
-| Zusatzdesign | 39 € | ca. 30 Min. | Plakat/QR-Vorlage |
-| Weitere Stunde | 49 € | 1 Std. | Betreuung |
+| Produkt | Preismodell zur Entscheidung | Aufwandsmessung | Zweck |
+|---|---|---:|---|
+| Selbstbedienung | Veranstaltung oder Saison | nach Pilot messen | niedrige Einstiegshürde |
+| Begleiteter Pilot | einmalige Pilotpauschale | vollständig erfassen | Referenz und Risikoreduktion |
+| Saisonmodell | Saisonlizenz | Supportbedarf messen | wiederholbarer Kern |
+| Vor-Ort-Regie | Zeit-/Tagessatz | je Heimspiel | Premium und Vertrauensaufbau |
+| Zusatzdesign | Festpreisoption | je Vorlage | Poster und Hallenscreens |
 
-\* Ob Preise brutto oder netto ausgewiesen werden müssen, hängt von Unternehmensform, Kleinunternehmerstatus und Kundensituation ab und ist vor Verkaufsstart steuerlich festzulegen.
+Ob Preise brutto oder netto ausgewiesen werden müssen, hängt von Unternehmensform, Kleinunternehmerstatus und Kundensituation ab und ist vor Verkaufsstart steuerlich festzulegen.
 
-Transaktionsgebühren werden vom Mollie-Konto des Vereins getragen und transparent vor Vertragsschluss genannt. Vereinsglück erhält weder den Losumsatz noch eine automatische Provision oder Application Fee aus einzelnen Loszahlungen. Die Veranstaltungslizenz von 49 €, 99 € oder 249 € wird separat gegenüber dem Verein abgerechnet. So bleiben Loserlöse und Softwaremiete technisch und buchhalterisch getrennt.
+Transaktionsgebühren werden vom Mollie-Konto des Vereins getragen und transparent vor Vertragsschluss genannt. Vereinsglück erhält weder den Losumsatz noch eine automatische Provision oder Application Fee aus einzelnen Loszahlungen. Die noch festzulegende Softwaremiete wird separat gegenüber dem Verein abgerechnet. So bleiben Loserlöse und Softwaremiete technisch und buchhalterisch getrennt.
 
-### Beispielrechnung Jahr 1
+### Wirtschaftlichkeitsmodell
 
-Planannahme, nicht Prognose:
-
-| Szenario | Veranstaltungen | Umsatzmix | Jahresumsatz |
-|---|---:|---|---:|
-| Vorsichtig | 24 | 12 × 49 €, 10 × 99 €, 2 × 249 € | 2.076 € |
-| Ziel | 60 | 20 × 49 €, 32 × 99 €, 8 × 249 € | 6.140 € |
-| Wachstum | 120 | 30 × 49 €, 70 × 99 €, 20 × 249 € | 13.380 € |
-
-Im Zielszenario sind zusätzlich etwa 600–1.200 € Zusatzleistungen realistisch, aber nicht in die Kernrechnung aufgenommen. Vor-Ort-Fahrtkosten sind durchlaufend und kein Deckungsbeitrag.
+Vor einer Jahresrechnung müssen drei reale Piloten Einrichtungszeit, Supportzeit, Hostingkosten, Vor-Ort-Aufwand und Zahlungsnebenkosten liefern. Erst danach werden Szenarien aus Anzahl Heimspiele × manuell freigegebenem Paketpreis berechnet. Bis dahin sind Umsatzprognosen nicht belastbar.
 
 Die größten Kostenblöcke sind Hosting/Monitoring, Versicherung und Beratung, Marketingmaterial, Fahrtzeit sowie eigener Support. Vor dem Verkauf wird eine monatliche Kostenliste ergänzt; erst danach ist eine belastbare Gewinnschwelle berechenbar.
 
@@ -68,18 +62,18 @@ Die größten Kostenblöcke sind Hosting/Monitoring, Versicherung und Beratung, 
 
 ### Pilotphase (erste 90 Tage)
 
-1. Drei Pilotvereine aus unterschiedlichen Segmenten gewinnen: Feuerwehr, Sport/Musik, Kindergarten-Förderverein.
-2. Pilotpreis 49 € für das volle 99-€-Paket gegen strukturiertes Feedback und Erlaubnis für eine Fallstudie.
+1. Drei Eishockey-Pilotvereine mit unterschiedlichen Hallensituationen gewinnen: Monitor/Beamer, LED-Wand und Minimaltechnik.
+2. Pilotkonditionen erst nach Aufwandsschätzung manuell entscheiden; strukturiertes Feedback und eine mögliche Fallstudie separat vereinbaren.
 3. Pro Pilot messen: Einrichtungszeit, Supportkontakte, Zahlquote, Abbrüche, verkaufte Lose, Zufriedenheit und Wiederbuchungsabsicht.
 4. Erst nach drei technisch und organisatorisch sauberen Veranstaltungen aktiv skalieren.
 
 ### Akquise
 
 - persönliche Ansprache regionaler Vereinsvorstände
-- einseitiges PDF mit QR-Demo und Festpreis
+- einseitiges PDF mit QR-Demo und offenem Pilotmodell
 - Kooperationen mit Gemeinden, Kreisjugendringen und Vereinsringen
 - Ausstellerkontakt auf Feuerwehr-, Musik- und Ehrenamtsveranstaltungen
-- Empfehlungsbonus: 20 € Gutschrift für den werbenden Verein nach bezahlter Folgebuchung
+- ein mögliches Empfehlungsmodell erst nach Pilotphase und manueller Preisentscheidung prüfen
 
 Keine Behauptung „genehmigungsfrei“ oder „rechtssicher“. Stattdessen erhält jeder Verein eine Checkliste für seine zuständige Behörde und Steuerberatung.
 
@@ -102,7 +96,7 @@ Vor jedem Pilotbetrieb ist eine fachliche Prüfung notwendig. Wesentliche Leitpl
 - Der Verein ist als Veranstalter für Genehmigung/Anzeige, Teilnahmebedingungen, Jugendschutz, Gewinne, Ziehung und steuerliche Behandlung verantwortlich. Vereinsglück stellt Checklisten bereit, ersetzt aber keine Rechts- oder Steuerberatung.
 - Jeder Verein nutzt ein eigenes Mollie-Konto und bleibt Eigentümer der Zahlungen sowie Empfänger der Auszahlungen. Kein Losumsatz wird auf ein Mollie- oder Bankkonto von Vereinsglück geleitet.
 - Die Plattform verwendet Mollie Connect mit einer vom Verein freigegebenen OAuth-Verbindung. Sie speichert keinen gemeinsamen geheimen API-Schlüssel für mehrere Vereine und fordert Vereine nicht zur Weitergabe ihrer API-Schlüssel auf.
-- Die 49-/99-/249-Euro-Softwaremiete wird separat abgerechnet; bei Loszahlungen wird keine Application Fee und keine Umsatzbeteiligung einbehalten.
+- Die noch festzulegende Softwaremiete wird separat abgerechnet; bei Loszahlungen wird keine Application Fee und keine Umsatzbeteiligung einbehalten.
 - Personenbezogene Daten werden minimiert. Für einen Loskauf sollten Name und mindestens ein sicherer Kontaktweg genügen; optionale Felder werden entfernt.
 - Auftragsverarbeitungsvertrag, Löschkonzept, technische und organisatorische Maßnahmen, Datenschutzerklärung, Impressum, AGB/Leistungsbeschreibung und Haftungsgrenzen müssen vor dem ersten bezahlten Einsatz vorliegen.
 - Rückerstattungen, Stornierung, nicht stattfindende Ziehung und nicht abgeholte Gewinne brauchen klare Prozesse.
@@ -133,7 +127,7 @@ Begleiteter Betrieb, Messung, Fehlerprotokoll und standardisierte Einweisung. Ke
 
 ### Phase 3 – Regionaler Verkauf
 
-99-€-Paket als Standard, wiederholbarer Onboardingprozess, Referenzen und maximal so viele parallele Veranstaltungen, wie der Support sicher tragen kann.
+Manuell beschlossenes Standardpaket, wiederholbarer Onboardingprozess, Referenzen und maximal so viele parallele Veranstaltungen, wie der Support sicher tragen kann.
 
 ## 10. Entscheidungskriterien
 
@@ -143,7 +137,7 @@ Nach drei Piloten wird nur weiter investiert, wenn:
 - kein kritischer Zahlungs- oder Datenschutzfehler auftritt,
 - mindestens 80 % der Käufer ohne Hilfe abschließen,
 - mindestens zwei von drei Vereinen erneut buchen oder empfehlen würden,
-- das 99-€-Paket nach Supportzeit einen positiven Deckungsbeitrag hat.
+- das nach den Piloten beschlossene Standardpaket nach Supportzeit einen positiven Deckungsbeitrag hat.
 
 Andernfalls werden Preis, Umfang oder Zielgruppe angepasst, bevor weitere Vereine akquiriert werden.
 

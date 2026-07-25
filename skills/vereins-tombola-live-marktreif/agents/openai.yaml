@@ -1,0 +1,4 @@
+interface:
+  display_name: "Vereins-Tombola live und marktreif"
+  short_description: "Tombola rechtssicher vorbereiten und testen"
+  default_prompt: "Nutze $vereins-tombola-live-marktreif, um die Vereins-Tombola markt- und pilotreif zu prüfen, ohne Verkäufe oder Kontakte eigenmächtig auszulösen."
